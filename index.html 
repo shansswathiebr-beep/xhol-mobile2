@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>XHOL Mobile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        :root {
+            --bg: #050505;
+            --gold: #d4af37;
+            --gold-light: #f4d03f;
+            --gold-dim: rgba(212, 175, 55, 0.3);
+            --card-bg: #1a1a1a;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --warn: #f39c12;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: white;
+        }
+
+        #app {
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.1), transparent);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            flex-shrink: 0;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--gold-dim);
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.9);
+            background: var(--gold);
+            color: #000;
+        }
+
+        .title-group {
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .title-group h1 {
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.15rem;
+        }
+
+        .subtitle {
+            font-size: 0.65rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--gold-dim);
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            min-width: 40px;
+        }
+
+        /* Game Area */
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        /* Decks */
+        .deck-row {
+            height: 110px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .deck-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .deck-label {
+            font-size: 0.7rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.08rem;
+            font-weight: 600;
+        }
+
+        .deck-card {
+            width: 60px;
+            height: 84px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: transform 0.15s;
+        }
+
+        .deck-card:active {
+            transform: scale(0.92);
+        }
+
+        .deck-back {
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                #1a1a1a,
+                #1a1a1a 4px,
+                rgba(212, 175, 55, 0.15) 4px,
+                rgba(212, 175, 55, 0.15) 8px
+            );
+            border: 2px solid var(--gold-dim);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .counter-badge {
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .discard-card {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Discard highlight */
+        #discardPile.drop-target {
+            box-shadow: 0 0 0 3px var(--warn), 0 0 20px rgba(243,156,18,0.6);
+            border-radius: 8px;
+        }
+
+        /* Sets Grid */
+        .sets-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        .set-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px dashed rgba(212, 175, 55, 0.25);
+            border-radius: 12px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            transition: all 0.2s;
+        }
+
+        .set-container.valid {
+            border-style: solid;
+            border-color: var(--success);
+            background: rgba(39, 174, 96, 0.08);
+        }
+
+        .set-container.invalid {
+            border-style: solid;
+            border-color: var(--error);
+            animation: shake 0.4s;
+        }
+
+        .set-container.warn-partial {
+            border-style: solid;
+            border-color: var(--warn);
+            background: rgba(243, 156, 18, 0.06);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .set-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .set-name {
+            font-size: 0.65rem;
+            color: var(--gold);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .set-progress {
+            font-size: 0.75rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .set-slots {
+            flex: 1;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slot {
+            flex: 1;
+            max-width: 40px;
+            aspect-ratio: 2/3;
+            border: 1px dashed rgba(212, 175, 55, 0.15);
+            border-radius: 4px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .card-slot {
+            flex: 1;
+            max-width: 40px;
+            aspect-ratio: 2/3;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.12s;
+        }
+
+        .card-slot:active {
+            transform: scale(0.88);
+        }
+
+        .card-slot.red { color: #e74c3c; }
+        .card-slot.black { color: #2c3e50; }
+        .card-slot.joker {
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            color: white;
+        }
+
+        /* Hand Area */
+        .hand-area {
+            height: 100px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 16px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .hand-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .hand-scroll {
+            flex: 1;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            align-items: center;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            padding: 0 4px;
+        }
+
+        .hand-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hand-card {
+            flex-shrink: 0;
+            width: 50px;
+            height: 70px;
+            background: white;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: grab;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            scroll-snap-align: center;
+            position: relative;
+            touch-action: none;
+            font-size: 0.9rem;
+        }
+
+        .hand-card.red { color: #e74c3c; }
+        .hand-card.black { color: #2c3e50; }
+        .hand-card.joker {
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .hand-card.dragging {
+            position: fixed;
+            z-index: 1000;
+            transform: scale(1.15) rotate(8deg);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+            pointer-events: none;
+            opacity: 0.95;
+        }
+
+        /* Action Bar */
+        .actions {
+            height: 70px;
+            display: flex;
+            gap: 12px;
+            padding: 10px 16px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8), rgba(5,5,5,0.95));
+            border-top: 1px solid rgba(212, 175, 55, 0.15);
+            flex-shrink: 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        }
+
+        .btn {
+            flex: 1;
+            height: 48px;
+            border-radius: 24px;
+            border: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            letter-spacing: 0.05rem;
+            transition: all 0.15s;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: #000;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Tutorial Overlay */
+        .tutorial {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .tutorial.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tut-step {
+            position: absolute;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 280px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .tut-step.active {
+            display: flex;
+            animation: fadeUp 0.4s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .tut-bubble {
+            background: var(--gold);
+            color: #000;
+            padding: 16px 20px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .tut-arrow {
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 16px solid var(--gold);
+            margin-top: 4px;
+        }
+
+        .tut-arrow.down {
+            transform: rotate(180deg);
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
+        .tut-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 2001;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .highlight {
+            position: relative;
+            z-index: 2001;
+            box-shadow: 0 0 0 4px var(--gold), 0 0 30px rgba(212, 175, 55, 0.6);
+            border-radius: 12px;
+            animation: pulse-highlight 1.5s infinite;
+        }
+
+        @keyframes pulse-highlight {
+            0%, 100% { box-shadow: 0 0 0 4px var(--gold), 0 0 20px rgba(212, 175, 55, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0.5), 0 0 40px rgba(212, 175, 55, 0.8); }
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: #111;
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 24px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .modal.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal h2 {
+            color: var(--gold);
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+        }
+
+        .modal p {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0,0,0,0.95);
+            color: var(--gold);
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--gold-dim);
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.error {
+            color: var(--error);
+            border-color: var(--error);
+        }
+
+        .toast.warn {
+            color: var(--warn);
+            border-color: var(--warn);
+        }
+
+        @media (max-height: 700px) {
+            .deck-row { height: 95px; }
+            .deck-card { width: 54px; height: 76px; }
+            .hand-area { height: 90px; }
+            .hand-card { width: 44px; height: 62px; font-size: 0.85rem; }
+            .card-slot { max-width: 34px; font-size: 0.8rem; }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .sets-grid { grid-template-columns: repeat(4, 1fr); }
+            .deck-row { height: 80px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-left">
+                <button class="icon-btn" id="btnHelp" title="Hilfe">?</button>
+                <button class="lang-btn" id="btnLang">DE</button>
+            </div>
+            <div class="title-group">
+                <h1>XHOL</h1>
+                <div class="subtitle" data-i18n="yourTurn">YOUR TURN</div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" id="btnSound" title="Sound">🔊</button>
+            </div>
+        </header>
+
+        <main class="game-area">
+            <section class="deck-row">
+                <div class="deck-item">
+                    <div class="deck-label" data-i18n="deck">DECK</div>
+                    <div class="deck-card" id="drawPile">
+                        <div class="deck-back">🂠</div>
+                        <div class="counter-badge" id="countDraw">88</div>
+                    </div>
+                </div>
+                <div class="deck-item">
+                    <div class="deck-label" data-i18n="discard">DISCARD</div>
+                    <div class="deck-card" id="discardPile">
+                        <div class="counter-badge" id="countDiscard">0</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="sets-grid">
+                <div class="set-container" data-set="3-1" id="set3-1">
+                    <div class="set-header">
+                        <span class="set-name" data-i18n="set3">3-CARD SET</span>
+                        <span class="set-progress">0/3</span>
+                    </div>
+                    <div class="set-slots" id="slots3-1">
+                        <div class="slot"></div><div class="slot"></div><div class="slot"></div>
+                    </div>
+                </div>
+                <div class="set-container" data-set="3-2" id="set3-2">
+                    <div class="set-header">
+                        <span class="set-name" data-i18n="set3">3-CARD SET</span>
+                        <span class="set-progress">0/3</span>
+                    </div>
+                    <div class="set-slots" id="slots3-2">
+                        <div class="slot"></div><div class="slot"></div><div class="slot"></div>
+                    </div>
+                </div>
+                <div class="set-container" data-set="4-1" id="set4-1">
+                    <div class="set-header">
+                        <span class="set-name" data-i18n="set4">4-CARD SET</span>
+                        <span class="set-progress">0/4</span>
+                    </div>
+                    <div class="set-slots" id="slots4-1">
+                        <div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div>
+                    </div>
+                </div>
+                <div class="set-container" data-set="4-2" id="set4-2">
+                    <div class="set-header">
+                        <span class="set-name" data-i18n="set4">4-CARD SET</span>
+                        <span class="set-progress">0/4</span>
+                    </div>
+                    <div class="set-slots" id="slots4-2">
+                        <div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="hand-area">
+                <div class="hand-header">
+                    <span data-i18n="yourHand">YOUR HAND</span>
+                    <span id="handCount">14</span>
+                </div>
+                <div class="hand-scroll" id="handCards"></div>
+            </section>
+        </main>
+
+        <nav class="actions">
+            <button class="btn btn-secondary" id="btnNew">
+                <span>↻</span> <span data-i18n="new">NEW</span>
+            </button>
+            <button class="btn btn-primary" id="btnXhol">
+                <span>⚑</span> XHOL!
+            </button>
+        </nav>
+    </div>
+
+    <!-- Tutorial -->
+    <div class="tutorial" id="tutorial">
+        <div class="tut-close" id="closeTut">×</div>
+        
+        <div class="tut-step" id="tut1" style="top: 120px;">
+            <div class="tut-bubble" data-i18n="tut1">Willkommen bei XHOL! Ziehe Karten vom Deck oder Ablagestapel.</div>
+            <div class="tut-arrow"></div>
+        </div>
+        
+        <div class="tut-step" id="tut2" style="top: 45%; transform: translate(-50%, -50%);">
+            <div class="tut-bubble" data-i18n="tut2">Erstelle 2 Sets mit je 3 Karten und 2 Sets mit je 4 Karten. Sets können Gruppen (gleicher Wert) oder Runs (gleiche Farbe) sein.</div>
+        </div>
+        
+        <div class="tut-step" id="tut3" style="bottom: 160px;">
+            <div class="tut-arrow down"></div>
+            <div class="tut-bubble" data-i18n="tut3">Halte Karten gedrückt und ziehe sie in die leeren Slots. Tippe auf eine Karte im Set, um sie zurückzunehmen.</div>
+        </div>
+        
+        <div class="tut-step" id="tut4" style="bottom: 90px;">
+            <div class="tut-arrow down"></div>
+            <div class="tut-bubble" data-i18n="tut4">Drücke XHOL! wenn alle Sets vollständig sind.</div>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div class="modal-overlay" id="winOverlay"></div>
+    <div class="modal" id="winModal">
+        <h2>🎉 XHOL! 🎉</h2>
+        <p data-i18n="winText">Glückwunsch! Du hast alle Sets gültig gebildet!</p>
+        <button class="modal-btn" id="btnAgain" data-i18n="playAgain">Neues Spiel</button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // I18N System - 4 Sprachen
+        const i18n = {
+            lang: 'de',
+            data: {
+                de: {
+                    yourTurn: 'DEIN ZUG', deck: 'DECK', discard: 'ABLAGE',
+                    set3: '3er SET', set4: '4er SET', yourHand: 'DEINE HAND',
+                    new: 'NEU', playAgain: 'Neues Spiel',
+                    winText: 'Glückwunsch! Du hast alle Sets gültig gebildet!',
+                    tut1: 'Willkommen bei XHOL! Ziehe Karten vom Deck oder Ablagestapel.',
+                    tut2: 'Erstelle 2 Sets mit je 3 Karten und 2 Sets mit je 4 Karten. Sets können Gruppen (gleicher Wert) oder Runs (gleiche Farbe) sein.',
+                    tut3: 'Halte Karten gedrückt und ziehe sie in die leeren Slots. Tippe auf eine Karte im Set, um sie zurückzunehmen.',
+                    tut4: 'Drücke XHOL! wenn alle Sets vollständig sind.',
+                    cardDrawn: 'Karte gezogen', cardReturned: 'Zurückgenommen', cardDiscarded: 'Abgelegt',
+                    setFull: 'Set voll!', invalid: 'Ungültig', valid: 'Gültig!', warnPartial: 'Ungültige Kombination'
+                },
+                en: {
+                    yourTurn: 'YOUR TURN', deck: 'DECK', discard: 'DISCARD',
+                    set3: '3-CARD SET', set4: '4-CARD SET', yourHand: 'YOUR HAND',
+                    new: 'NEW', playAgain: 'New Game',
+                    winText: 'Congratulations! You completed all sets!',
+                    tut1: 'Welcome to XHOL! Draw cards from the deck or discard pile.',
+                    tut2: 'Create 2 sets of 3 cards and 2 sets of 4 cards. Sets can be groups (same value) or runs (same suit).',
+                    tut3: 'Hold and drag cards into empty slots. Tap a card in a set to return it to hand.',
+                    tut4: 'Press XHOL! when all sets are complete.',
+                    cardDrawn: 'Card drawn', cardReturned: 'Returned', cardDiscarded: 'Discarded',
+                    setFull: 'Set full!', invalid: 'Invalid', valid: 'Valid!', warnPartial: 'Invalid combination'
+                },
+                sq: {
+                    yourTurn: 'RADHA JUAJ', deck: 'LETA', discard: 'HEDHUR',
+                    set3: 'SET 3 LETA', set4: 'SET 4 LETA', yourHand: 'DORA JOTE',
+                    new: 'I RI', playAgain: 'Lojë e re',
+                    winText: 'Urime! Keni përfunduar të gjitha setet!',
+                    tut1: 'Mirësevini në XHOL! Tërhiqni letra nga lejla ose grumbulli i hedhur.',
+                    tut2: 'Krijoni 2 sete me 3 letra dhe 2 sete me 4 letra. Setet mund të jenë grupe ose vargje.',
+                    tut3: 'Mbaj dhe tërhiq letrat në sete. Prek një letër në set për ta kthyer.',
+                    tut4: 'Shtypni XHOL! kur të gjitha setet të përfunduara.',
+                    cardDrawn: 'Letër tërhequr', cardReturned: 'Kthyer', cardDiscarded: 'Hedhur',
+                    setFull: 'Set i plotë!', invalid: 'I pavlefshëm', valid: 'I vlefshëm!', warnPartial: 'Kombinim i pavlefshëm'
+                },
+                ta: {
+                    yourTurn: 'உங்கள் முறை', deck: 'டெக்', discard: 'தூக்கி எறி',
+                    set3: '3 அட்டைகள்', set4: '4 அட்டைகள்', yourHand: 'கை',
+                    new: 'புதிய', playAgain: 'புதிய விளையாட்டு',
+                    winText: 'வாழ்த்துக்கள்! அனைத்து அமைப்புகளையும் முடித்துவிட்டீர்கள்!',
+                    tut1: 'XHOL க்கு வருக! டெக் அல்லது டிஸ்கார்ட் பைலில் இருந்து அட்டைகளை எடுக்கவும்.',
+                    tut2: '3 அட்டைகள் கொண்ட 2 அமைப்புகள் மற்றும் 4 அட்டைகள் கொண்ட 2 அமைப்புகளை உருவாக்கவும்.',
+                    tut3: 'அட்டைகளை அழுத்தி அமைப்புகளுக்கு இழுக்கவும். அமைப்பில் உள்ள அட்டையைத் தட்டவும்.',
+                    tut4: 'அனைத்து அமைப்புகளும் முழுமையானதும் XHOL! அழுத்தவும்.',
+                    cardDrawn: 'அட்டை எடுக்கப்பட்டது', cardReturned: 'திரும்பப் பெற்றது', cardDiscarded: 'வீசப்பட்டது',
+                    setFull: 'அமைப்பு நிரம்பியது!', invalid: 'தவறானது', valid: 'சரியானது!', warnPartial: 'தவறான சேர்க்கை'
+                }
+            },
+            t(k) { return this.data[this.lang][k] || k; },
+            set(l) {
+                this.lang = l;
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const k = el.getAttribute('data-i18n');
+                    if(this.data[l][k]) el.textContent = this.data[l][k];
+                });
+                localStorage.setItem('xhol-lang', l);
+                document.documentElement.lang = l;
+            }
+        };
+
+        // Game Logic
+        class Game {
+            constructor() {
+                this.suits = ['♥','♦','♠','♣'];
+                this.vals = ['2','3','4','5','6','7','8','9','10','B','D','K','A'];
+                this.ord = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'B':11,'D':12,'K':13,'A':14};
+                this.reset();
+            }
+
+            reset() {
+                this.deck = []; this.discard = []; this.hand = [];
+                this.sets = {'3-1':[],'3-2':[],'4-1':[],'4-2':[]};
+                // 2 decks
+                for(let d=0; d<2; d++)
+                    for(let s of this.suits)
+                        for(let v of this.vals)
+                            this.deck.push({v, s, c: (s==='♥'||s==='♦')?'red':'black', j: false});
+                // 4 Jokers
+                for(let i=0; i<4; i++)
+                    this.deck.push({v:'★', s:'J', c:'joker', j: true});
+                this.shuffle();
+                for(let i=0; i<14; i++) this.hand.push(this.deck.pop());
+                this.discard.push(this.deck.pop());
+            }
+
+            shuffle() {
+                for(let i=this.deck.length-1; i>0; i--) {
+                    const j = Math.floor(Math.random()*(i+1));
+                    [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
+                }
+            }
+
+            draw(fromDiscard=false) {
+                if(fromDiscard) {
+                    if(this.discard.length===0) return false;
+                    this.hand.push(this.discard.pop());
+                } else {
+                    if(this.deck.length===0) this.reshuffle();
+                    if(this.deck.length===0) return false;
+                    this.hand.push(this.deck.pop());
+                }
+                return true;
+            }
+
+            reshuffle() {
+                if(this.discard.length<2) return;
+                const top = this.discard.pop();
+                this.deck = this.discard;
+                this.discard = [top];
+                this.shuffle();
+            }
+
+            addToSet(sid, idx) {
+                const max = sid.startsWith('3')?3:4;
+                if(this.sets[sid].length >= max) return 'full';
+                this.sets[sid].push(this.hand[idx]);
+                this.hand.splice(idx, 1);
+                return 'ok';
+            }
+
+            removeFromSet(sid, cardIdx) {
+                if(cardIdx<0 || cardIdx>=this.sets[sid].length) return false;
+                const card = this.sets[sid].splice(cardIdx, 1)[0];
+                this.hand.push(card);
+                return true;
+            }
+
+            discardFromHand(idx) {
+                if(idx<0 || idx>=this.hand.length) return false;
+                this.discard.push(this.hand.splice(idx, 1)[0]);
+                return true;
+            }
+
+            validatePartial(sid) {
+                const c = this.sets[sid];
+                if(c.length===0) return 'empty';
+                if(c.length===1) return 'ok';
+                const r = c.filter(x=>!x.j);
+                if(r.length===0) return 'ok';
+                // Check if could be group
+                const couldBeGroup = r.every(x=>x.v===r[0].v) && new Set(r.map(x=>x.s)).size===r.length;
+                // Check if could be run (same suit)
+                const couldBeRun = r.every(x=>x.s===r[0].s);
+                return (couldBeGroup || couldBeRun)?'ok':'warn';
+            }
+
+            validate(sid) {
+                const c = this.sets[sid];
+                if(c.length===0) return false;
+                const j = c.filter(x=>x.j), r = c.filter(x=>!x.j);
+                if(r.length===0) return false;
+                // Group check
+                if(r.every(x=>x.v===r[0].v) && new Set(r.map(x=>x.s)).size===r.length) return true;
+                // Run check
+                if(r.every(x=>x.s===r[0].s)) {
+                    const s = [...r].sort((a,b)=>this.ord[a.v]-this.ord[b.v]);
+                    let gaps = 0;
+                    for(let i=1; i<s.length; i++)
+                        gaps += this.ord[s[i].v]-this.ord[s[i-1].v]-1;
+                    if(j.length>=gaps) return true;
+                }
+                return false;
+            }
+
+            checkWin() {
+                return Object.keys(this.sets).every(k=>{
+                    const max = k.startsWith('3')?3:4;
+                    return this.sets[k].length===max && this.validate(k);
+                });
+            }
+        }
+
+        const game = new Game();
+        let dragEl = null, dragIdx = null;
+
+        function render() {
+            document.getElementById('countDraw').textContent = game.deck.length;
+            document.getElementById('countDiscard').textContent = game.discard.length;
+            document.getElementById('handCount').textContent = game.hand.length;
+
+            // Discard pile
+            const dp = document.getElementById('discardPile');
+            if(game.discard.length>0) {
+                const t = game.discard[game.discard.length-1];
+                const style = t.j ? 'background:linear-gradient(135deg,#f39c12,#e74c3c);color:#fff;' : `color:${t.c==='red'?'#e74c3c':'#2c3e50'};`;
+                dp.innerHTML = `<div class="discard-card" style="${style}">
+                    <div style="font-size:1.1rem;font-weight:bold;">${t.v}</div>
+                    <div style="font-size:1.4rem;">${t.s}</div>
+                </div><div class="counter-badge">${game.discard.length}</div>`;
+            } else {
+                dp.innerHTML = '<div class="counter-badge">0</div>';
+            }
+
+            // Hand
+            const hc = document.getElementById('handCards');
+            hc.innerHTML = '';
+            game.hand.forEach((c,i)=>{
+                const el = document.createElement('div');
+                el.className = `hand-card ${c.c}`;
+                el.dataset.idx = i;
+                if(c.j) {
+                    el.innerHTML = '<div>★</div>';
+                } else {
+                    el.innerHTML = `<div style="font-size:0.65rem;position:absolute;top:2px;left:2px;">${c.v}</div>
+                                   <div style="font-size:1.1rem;">${c.s}</div>
+                                   <div style="font-size:0.65rem;position:absolute;bottom:2px;right:2px;transform:rotate(180deg);">${c.v}</div>`;
+                }
+                el.addEventListener('touchstart', startDrag, {passive:false});
+                el.addEventListener('mousedown', startDrag);
+                hc.appendChild(el);
+            });
+
+            // Sets
+            ['3-1','3-2','4-1','4-2'].forEach(id=>{
+                const box = document.getElementById(`set${id}`);
+                const slots = document.getElementById(`slots${id}`);
+                const cs = game.sets[id];
+                const max = parseInt(id.split('-')[0]);
+
+                box.querySelector('.set-progress').textContent = `${cs.length}/${max}`;
+                slots.innerHTML = '';
+
+                for(let i=0; i<max; i++) {
+                    if(i<cs.length) {
+                        const c = cs[i];
+                        const d = document.createElement('div');
+                        d.className = `card-slot ${c.c}`;
+                        if(c.j) {
+                            d.innerHTML = '<div style="font-size:1.2rem;">★</div>';
+                        } else {
+                            d.innerHTML = `<div style="font-size:0.55rem;position:absolute;top:1px;left:1px;">${c.v}</div>
+                                          <div style="font-size:1rem;">${c.s}</div>
+                                          <div style="font-size:0.55rem;position:absolute;bottom:1px;right:1px;transform:rotate(180deg);">${c.v}</div>`;
+                        }
+                        // Click to return to hand
+                        d.addEventListener('click', ()=>{
+                            if(game.removeFromSet(id, i)) {
+                                render();
+                                showToast(i18n.t('cardReturned'));
+                            }
+                        });
+                        slots.appendChild(d);
+                    } else {
+                        const slot = document.createElement('div');
+                        slot.className = 'slot';
+                        slots.appendChild(slot);
+                    }
+                }
+
+                // Validation styling
+                box.classList.remove('valid','invalid','warn-partial');
+                if(cs.length===max) {
+                    box.classList.add(game.validate(id)?'valid':'invalid');
+                } else if(cs.length>0) {
+                    const pv = game.validatePartial(id);
+                    if(pv==='warn') box.classList.add('warn-partial');
+                }
+            });
+        }
+
+        function startDrag(e) {
+            if(e.type==='mousedown' && e.button!==0) return;
+            e.preventDefault();
+            const t = e.touches ? e.touches[0] : e;
+            const tgt = e.currentTarget;
+            dragIdx = parseInt(tgt.dataset.idx);
+
+            dragEl = tgt.cloneNode(true);
+            dragEl.classList.add('dragging');
+            dragEl.style.left = t.clientX-25+'px';
+            dragEl.style.top = t.clientY-35+'px';
+            document.body.appendChild(dragEl);
+            tgt.style.opacity = '0.3';
+
+            const isTouch = !!e.touches;
+            const evMove = isTouch?'touchmove':'mousemove';
+            const evEnd = isTouch?'touchend':'mouseup';
+
+            const move = ev=>{
+                const p = isTouch?ev.touches[0]:ev;
+                dragEl.style.left = p.clientX-25+'px';
+                dragEl.style.top = p.clientY-35+'px';
+                
+                // Highlight discard pile
+                const under = document.elementFromPoint(p.clientX, p.clientY);
+                const onDiscard = !!under?.closest('#discardPile');
+                document.getElementById('discardPile').classList.toggle('drop-target', onDiscard);
+            };
+
+            const end = ev=>{
+                document.removeEventListener(evMove, move);
+                document.removeEventListener(evEnd, end);
+                dragEl.remove();
+                tgt.style.opacity = '1';
+                document.getElementById('discardPile').classList.remove('drop-target');
+
+                const p = isTouch?ev.changedTouches[0]:ev;
+                const target = document.elementFromPoint(p.clientX, p.clientY);
+
+                // Check set drop
+                const setBox = target?.closest('.set-container');
+                if(setBox) {
+                    const result = game.addToSet(setBox.dataset.set, dragIdx);
+                    if(result==='ok') {
+                        const sid = setBox.dataset.set;
+                        render();
+                        if(game.sets[sid].length===(sid.startsWith('3')?3:4) && game.validate(sid)) {
+                            showToast(i18n.t('valid'));
+                        } else if(game.validatePartial(sid)==='warn') {
+                            showToast(i18n.t('warnPartial'), 'warn');
+                        }
+                    } else if(result==='full') {
+                        showToast(i18n.t('setFull'), 'error');
+                    }
+                    dragEl = null;
+                    return;
+                }
+
+                // Check discard drop
+                const discardTarget = target?.closest('#discardPile');
+                if(discardTarget) {
+                    if(game.discardFromHand(dragIdx)) {
+                        render();
+                        showToast(i18n.t('cardDiscarded'));
+                    }
+                    dragEl = null;
+                    return;
+                }
+
+                dragEl = null;
+            };
+
+            document.addEventListener(evMove, move, {passive:false});
+            document.addEventListener(evEnd, end);
+        }
+
+        let toastTimer;
+        function showToast(msg, type='') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show'+(type?' '+type:'');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(()=>t.classList.remove('show'), 2500);
+        }
+
+        // Tutorial
+        let step = 0;
+        const steps = ['tut1','tut2','tut3','tut4'];
+
+        function showTut() {
+            step = 0;
+            document.getElementById('tutorial').classList.add('active');
+            updateTut();
+        }
+
+        function updateTut() {
+            steps.forEach((s,i)=>document.getElementById(s).classList.toggle('active', i===step));
+            document.querySelectorAll('.highlight').forEach(el=>el.classList.remove('highlight'));
+            if(step===0) document.getElementById('drawPile').classList.add('highlight');
+            if(step===1) document.querySelector('.sets-grid').classList.add('highlight');
+            if(step===2) document.querySelector('.hand-area').classList.add('highlight');
+            if(step===3) document.getElementById('btnXhol').classList.add('highlight');
+        }
+
+        function nextTut() {
+            step++;
+            if(step>=steps.length) {
+                document.getElementById('tutorial').classList.remove('active');
+                localStorage.setItem('xhol-tut', 'done');
+            } else {
+                updateTut();
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('drawPile').onclick = ()=>{
+            if(game.draw()) {
+                render();
+                showToast(i18n.t('cardDrawn'));
+                if(document.querySelector('.tut-step.active')) nextTut();
+            }
+        };
+
+        document.getElementById('discardPile').onclick = ()=>{
+            if(game.draw(true)) {
+                render();
+                showToast(i18n.t('cardDrawn'));
+                if(document.querySelector('.tut-step.active')) nextTut();
+            }
+        };
+
+        document.getElementById('btnNew').onclick = ()=>{
+            game.reset();
+            render();
+            showToast(i18n.t('new'));
+        };
+
+        document.getElementById('btnXhol').onclick = ()=>{
+            if(game.checkWin()) {
+                document.getElementById('winOverlay').classList.add('show');
+                document.getElementById('winModal').classList.add('show');
+            } else {
+                showToast(i18n.t('invalid'), 'error');
+                Object.keys(game.sets).forEach(k=>{
+                    const b = document.getElementById(`set${k}`);
+                    const max = k.startsWith('3')?3:4;
+                    if(game.sets[k].length===max && !game.validate(k)) {
+                        b.classList.add('invalid');
+                        setTimeout(()=>b.classList.remove('invalid'), 800);
+                    }
+                });
+            }
+        };
+
+        document.getElementById('btnAgain').onclick = ()=>{
+            document.getElementById('winOverlay').classList.remove('show');
+            document.getElementById('winModal').classList.remove('show');
+            game.reset();
+            render();
+        };
+
+        document.getElementById('btnHelp').onclick = showTut;
+        
+        // BUGFIX: 'active' statt 'show'
+        document.getElementById('closeTut').onclick = ()=>{
+            document.getElementById('tutorial').classList.remove('active');
+            localStorage.setItem('xhol-tut', 'done');
+        };
+
+        document.getElementById('tutorial').onclick = e=>{
+            if(e.target.id==='tutorial') nextTut();
+        };
+
+        // Language Toggle (4 Sprachen)
+        const langs = ['de','en','sq','ta'];
+        let li = 0;
+        document.getElementById('btnLang').onclick = ()=>{
+            li = (li+1)%langs.length;
+            i18n.set(langs[li]);
+            document.getElementById('btnLang').textContent = langs[li].toUpperCase();
+        };
+
+        // Sound Toggle (Mock)
+        let soundOn = true;
+        document.getElementById('btnSound').onclick = function() {
+            soundOn = !soundOn;
+            this.textContent = soundOn?'🔊':'🔇';
+        };
+
+        // Init
+        window.onload = ()=>{
+            const l = localStorage.getItem('xhol-lang');
+            if(l) {
+                i18n.set(l);
+                li = langs.indexOf(l);
+                document.getElementById('btnLang').textContent = l.toUpperCase();
+            }
+            render();
+            if(!localStorage.getItem('xhol-tut')) setTimeout(showTut, 500);
+        };
+    </script>
+</body>
+</html>
